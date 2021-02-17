@@ -107,7 +107,6 @@ void parseline(char* cmdline, char *argv[]) {
 	}
 }
 
-// Start of my 3 functions
 
 void blocklist(unsigned char * Heap) {
 	// print out blocks in order: pointer to start, payload size, allocation status
@@ -122,10 +121,10 @@ void blocklist(unsigned char * Heap) {
 		// start,           *start & -2,   *start & 1
 
 		if (*p & 1) { // if allocated
-			printf("%d, %d, allocated.\n", (p - start) + 1, (*p >> 1) - 2);
+			printf("%ld, %d, allocated.\n", (p - start) + 1, (*p >> 1) - 2);
 		}
 		else { // if free
-			printf("%d, %d, free.\n", (p - start) + 1, (*p >> 1) - 2);
+			printf("%ld, %d, free.\n", (p - start) + 1, (*p >> 1) - 2);
 		}
 		
 		p += (*p >> 1); // goes to next block
@@ -133,24 +132,18 @@ void blocklist(unsigned char * Heap) {
 
 }
 
+
 void writemem(unsigned char * Heap, int index, char * str) {
 	unsigned char *target = &Heap[index];
 	int size_of_str = strlen(str);
 	int i = 0;
 	for (i = 0; i < size_of_str; i++) {
 	*target = str[i]; // char is written into address
-
-		// "if a block is freed, you must ensure that whatever was written to the block is reset back to 0." confused on this
-		// if (*target & 1 == 0) { // if block is free
-		// 	// something is written to the block is reset back to zero?
-		// 	// my interpretation:
-		// 	*target = 0;
-		// }
-
-		target += (*target >> 1); // this goes to the next address?
+	target += (*target >> 1);
 	}
 	
 }
+
 
 void printmem(unsigned char * Heap, int index, int num_chars_to_print) {
 	unsigned char *target = &Heap[index];
@@ -161,11 +154,9 @@ void printmem(unsigned char * Heap, int index, int num_chars_to_print) {
 			break;
 		}
 		printf("%x ", *target); 
-		target += (*target >> 1); // this goes to the next address?
+		target += (*target >> 1);
 	}
 }
-
-// End of my three functions
 
 
 int main() {
