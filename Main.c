@@ -107,6 +107,66 @@ void parseline(char* cmdline, char *argv[]) {
 	}
 }
 
+// Start of my 3 functions
+
+void blocklist(unsigned char * Heap) {
+	// print out blocks in order: pointer to start, payload size, allocation status
+
+	unsigned char *start = &Heap[0]; // Header address of the first block
+	unsigned char *p = start;
+	unsigned char *end = &Heap[HEAP_SIZE-1]; // Footer address of the last block
+	// while start < end, then print out the blocks
+	while (p < end) {
+		// print each block information:
+		// pointer to start, payload size, allocation status
+		// start,           *start & -2,   *start & 1
+
+		if (*p & 1) { // if allocated
+			printf("%d, %d, allocated.\n", (p - start) + 1, (*p >> 1) - 2);
+		}
+		else { // if free
+			printf("%d, %d, free.\n", (p - start) + 1, (*p >> 1) - 2);
+		}
+		
+		p += (*p >> 1); // goes to next block
+	}
+
+}
+
+void writemem(unsigned char * Heap, int index, char * str) {
+	unsigned char *target = &Heap[index];
+	int size_of_str = strlen(str);
+	int i = 0;
+	for (i = 0; i < size_of_str; i++) {
+	*target = str[i]; // char is written into address
+
+		// "if a block is freed, you must ensure that whatever was written to the block is reset back to 0." confused on this
+		// if (*target & 1 == 0) { // if block is free
+		// 	// something is written to the block is reset back to zero?
+		// 	// my interpretation:
+		// 	*target = 0;
+		// }
+
+		target += (*target >> 1); // this goes to the next address?
+	}
+	
+}
+
+void printmem(unsigned char * Heap, int index, int num_chars_to_print) {
+	unsigned char *target = &Heap[index];
+	int i;
+	for (i = 0; i < num_chars_to_print; i++) {
+		if (i == num_chars_to_print - 1) {
+			printf("%x\n", *target);
+			break;
+		}
+		printf("%x ", *target); 
+		target += (*target >> 1); // this goes to the next address?
+	}
+}
+
+// End of my three functions
+
 
 int main() {
 	char cmdline[MAXLINE];
@@ -140,9 +200,9 @@ int main() {
 			if (free_block(Heap, atoi(argv[1])) == -1)
 				printf("Specified block cannot be freed (not allocated).\n");
 		}
-		// else if (strcmp(argv[0], "blocklist") == 0) blocklist(Heap);
-		// else if (strcmp(argv[0], "writemem") == 0) writemem(Heap, argv[1], argv[2]);
-		// else if (strcmp(argv[0], "printmem") == 0) printmem(Heap, argv[1], argv[2]);
+		else if (strcmp(argv[0], "blocklist") == 0) blocklist(Heap);
+		else if (strcmp(argv[0], "writemem") == 0) writemem(Heap, atoi(argv[1]), argv[2]);
+		else if (strcmp(argv[0], "printmem") == 0) printmem(Heap, atoi(argv[1]), atoi(argv[2]));
 		else if (strcmp(argv[0], "quit") == 0) break;
 		else printf("Invalid Input!\n");
 	}
